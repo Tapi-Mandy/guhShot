@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# --- Configuration ---
+SAVE_DIR="$HOME/Pictures/Screenshots"
+mkdir -p "$SAVE_DIR"
+# Branding updated in filename
+FILENAME="$SAVE_DIR/guhShot_$(date +%Y-%m-%d_%H-%M-%S).png"
+
+# --- Helper Functions ---
+notify_user() {
+    # Branding updated in notification
+    notify-send "guhShot" "Saved to: $FILENAME" -i camera-photo
+}
+
+take_full() {
+    sleep 0.2 # Wait for menu to close
+    grim "$FILENAME"
+    wl-copy < "$FILENAME"
+    notify_user
+}
+
+take_select() {
+    sleep 0.2
+    REGION=$(slurp -d)
+    if [ -z "$REGION" ]; then exit 1; fi
+    grim -g "$REGION" "$FILENAME"
+    wl-copy < "$FILENAME"
+    notify_user
+}
+
+# --- Logic ---
+
+# If no arguments are passed, show the Rofi menu
+if [ -z "$1" ]; then
+    # Branding updated in Rofi prompt
+    OPTION=$(echo -e "Region Selection\nFullscreen" | rofi -dmenu -p "guhShot" -lines 2)
+    
+    case "$OPTION" in
+        "Region Selection")
+            take_select
+            ;;
+        "Fullscreen")
+            take_full
+            ;;
+        *)
+            exit 1
+            ;;
+    esac
+    exit 0
+fi
+
+# Standard CLI arguments (for keybindings)
+case "$1" in
+    --full)
+        take_full
+        ;;
+    --select)
+        take_select
+        ;;
+esac

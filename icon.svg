@@ -1,0 +1,44 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon Background (Squircle) -->
+  <rect x="0" y="0" width="1024" height="1024" rx="220" fill="#a18674"/>
+  
+  <!-- Camera Group (Centered) -->
+  <g transform="translate(512, 512) scale(0.85) translate(-500, -500)">
+    
+    <!-- Shutter Button -->
+    <rect x="750" y="285" width="90" height="50" rx="10" fill="#B87E57"/>
+    
+    <!-- Top Hump -->
+    <path d="M410 225 L590 225 L640 325 L360 325 Z" fill="#382E28"/>
+    <!-- Hump Window -->
+    <rect x="415" y="245" width="170" height="50" rx="5" fill="#a18674"/>
+    
+    <!-- Main Body Mask & Layers -->
+    <defs>
+      <clipPath id="bodyClip">
+        <rect x="120" y="315" width="760" height="470" rx="40"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#bodyClip)">
+      <!-- Top/Bottom Dark Strips -->
+      <rect x="120" y="315" width="760" height="470" fill="#382E28"/>
+      <!-- Middle Vanilla Strip -->
+      <rect x="120" y="415" width="760" height="290" fill="#D1BEA8"/>
+    </g>
+    
+    <!-- Sensor Detail -->
+    <circle cx="795" cy="375" r="24" fill="#B87E57"/>
+    
+    <!-- Lens Assembly -->
+    <g transform="translate(500, 550)">
+      <circle r="225" fill="#382E28"/>
+      <circle r="195" fill="#E8DBD0"/>
+      <circle r="165" fill="#382E28"/>
+      <circle r="135" fill="#8F7258"/>
+      <circle r="95" fill="#382E28"/>
+      <circle r="65" fill="#F7F1E8"/>
+      <!-- Reflection -->
+      <circle cx="25" cy="-25" r="20" fill="#dbd9d9" opacity="0.9"/>
+    </g>
+  </g>
+</svg>

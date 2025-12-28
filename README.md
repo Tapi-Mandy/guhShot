@@ -1,2 +1,2 @@
 # guhShot
-Wayland screenshot utility, designed for guhwm
+Wayland screenshot utility
