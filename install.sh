@@ -1,88 +1,71 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Exit on error, undefined vars, and pipe failures
+set -euo pipefail
 
 # --- Configuration ---
 BASE_URL="https://raw.githubusercontent.com/Tapi-Mandy/guhShot/main"
 SCRIPT_URL="$BASE_URL/guhshot"
 ICON_URL="$BASE_URL/icon.svg"
 
-INSTALL_DIR="/usr/local/bin"
+# Arch standard is /usr/bin, but /usr/local/bin is safer for "manual" installs
+INSTALL_DIR="/usr/bin"
 DESKTOP_DIR="/usr/share/applications"
 ICON_DIR="/usr/share/icons/hicolor/scalable/apps"
 
-echo "----------------------------------------"
-echo "Starting guhShot Installer"
-echo "----------------------------------------"
-
-# --- 1. Install Dependencies ---
-echo "Checking and installing dependencies..."
-
-if command -v pacman &> /dev/null; then
-    # Arch Linux / Manjaro
-    sudo pacman -S --needed --noconfirm grim slurp wl-clipboard libnotify curl
-
-elif command -v apt-get &> /dev/null; then
-    # Debian / Ubuntu
-    sudo apt-get update
-    sudo apt-get install -y grim slurp wl-clipboard libnotify-bin curl
-
-elif command -v dnf &> /dev/null; then
-    # Fedora
-    sudo dnf install -y grim slurp wl-clipboard libnotify curl
-
-elif command -v zypper &> /dev/null; then
-    # OpenSUSE
-    sudo zypper install -y grim slurp wl-clipboard libnotify curl
-else
-    echo "Warning: Package manager not detected. Ensure 'grim slurp wl-clipboard libnotify curl' are installed."
+# Helper for sudo/root
+SUDO_CMD=""
+if [[ $EUID -ne 0 ]]; then
+    if command -v sudo >/dev/null 2>&1; then
+        SUDO_CMD="sudo"
+    else
+        echo "Error: This script requires root or sudo."
+        exit 1
+    fi
 fi
 
-# --- 2. Download Main Script ---
-echo "Downloading guhShot executable..."
-if sudo curl -fsSL "$SCRIPT_URL" -o "$INSTALL_DIR/guhshot"; then
-    sudo chmod +x "$INSTALL_DIR/guhshot"
-    echo "Executable installed."
-else
-    echo "Error: Failed to download guhshot script. Check URL or internet."
-    exit 1
-fi
+echo ":: Starting guhShot Installation"
 
-# --- 3. Download Icon ---
-echo "Downloading application icon..."
+# 1. Dependency Check
+echo ":: Checking dependencies..."
+# Check for pacman lock to avoid conflict in scripts
+while [ -f /var/lib/pacman/db.lck ]; do
+    echo ":: Waiting for another pacman instance to finish..."
+    sleep 1
+done
 
-# Ensure the icon directory exists
-sudo mkdir -p "$ICON_DIR"
+$SUDO_CMD pacman -S --needed --noconfirm grim slurp wl-clipboard libnotify curl
 
-# Download icon.svg and save it as guhshot.svg so the desktop entry finds it
-if sudo curl -fsSL "$ICON_URL" -o "$ICON_DIR/guhshot.svg"; then
-    echo "Icon installed."
-else
-    echo "Warning: Failed to download icon.svg. The app will work but might lack an icon."
-fi
+# 2. Prepare Directories
+$SUDO_CMD mkdir -p "$INSTALL_DIR" "$DESKTOP_DIR" "$ICON_DIR"
 
-# --- 4. Create Desktop Entry ---
-echo "Creating desktop entry..."
-cat <<EOF | sudo tee "$DESKTOP_DIR/guhshot.desktop" > /dev/null
+# 3. Download Executable
+echo ":: Downloading guhshot..."
+$SUDO_CMD curl -fsSL "$SCRIPT_URL" -o "$INSTALL_DIR/guhshot"
+$SUDO_CMD chmod +x "$INSTALL_DIR/guhshot"
+
+# 4. Download Icon
+echo ":: Downloading icon..."
+$SUDO_CMD curl -fsSL "$ICON_URL" -o "$ICON_DIR/guhshot.svg"
+
+# 5. Create Desktop Entry
+echo ":: Generating desktop entry..."
+cat <<EOF | $SUDO_CMD tee "$DESKTOP_DIR/guhshot.desktop" > /dev/null
 [Desktop Entry]
 Type=Application
 Name=guhShot
-Comment=Wayland screenshot utility
-Exec=$INSTALL_DIR/guhshot
+Comment=Guh?? Look At This!
+Exec=guhshot
 Icon=guhshot
 Terminal=false
 Categories=Utility;
 Keywords=screenshot;capture;grim;guh;
 EOF
 
-# --- 5. Refresh Icon Cache ---
-if command -v gtk-update-icon-cache &> /dev/null; then
-    sudo gtk-update-icon-cache /usr/share/icons/hicolor/
+# 6. Refresh Icon Cache (Only if GUI tools exist)
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    echo ":: Refreshing icon cache..."
+    $SUDO_CMD gtk-update-icon-cache -qtf /usr/share/icons/hicolor/
 fi
 
-echo "----------------------------------------"
-echo "Installation complete!"
-echo "1. Run 'guhshot' in terminal to test."
-echo "2. Look for the 'guhShot' icon in Rofi."
-echo "3. Add these bindings to mangowc config:"
-echo "   bind=NONE,Print,spawn,guhshot --full"
-echo "   bind=SHIFT,Print,spawn,guhshot --select"
-echo "----------------------------------------"
+echo ":: Installation Complete!"
