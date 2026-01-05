@@ -1,6 +1,6 @@
 <div align="left">
-  <h1>guhShot</h1>
-  <h3><img src="https://github.com/user-attachments/assets/485af1aa-52d7-4700-a0db-f42fec1d870c" width="180"> Wayland Screenshot Utility</h3>
+  <h1>Wayland Screenshot Utility</h1>
+  <h3><img src="https://github.com/user-attachments/assets/485af1aa-52d7-4700-a0db-f42fec1d870c" width="180"> guhShot</h3>
   <h4>Simple wrapper for `grim` & `slurp`</h4>
 </div>
 
