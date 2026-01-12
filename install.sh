@@ -74,7 +74,7 @@ Keywords=screenshot;capture;grim;guh;
 EOF
 
 # 4. Patch Mango Config
-echo -e "${CREAM}Patching $MANGO_CONFIG...${NC}"
+echo -e "${YLW}--> Patching config...${NC}"
 if [ -f "$MANGO_CONFIG" ]; then
     if grep -q "guhshot" "$MANGO_CONFIG"; then
         echo -e "${CREAM}guhShot binds already exist. Skipping patch.${NC}"
