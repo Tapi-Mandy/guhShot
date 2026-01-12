@@ -77,7 +77,7 @@ EOF
 echo -e "${YLW}--> Patching config...${NC}"
 if [ -f "$MANGO_CONFIG" ]; then
     if grep -q "guhshot" "$MANGO_CONFIG"; then
-        echo -e "${CREAM}guhShot binds already exist. Skipping patch.${NC}"
+        echo -e "${GRA}guhShot binds already exist. Skipping patch...${NC}"
     else
         # Define the lines to insert
         NEW_LINES="\n# Screenshot (guhShot)\nbind=NONE, Print, spawn, guhshot --full\nbind=SHIFT, Print, spawn, guhshot --select"
