@@ -104,4 +104,4 @@ if command -v gtk-update-icon-cache >/dev/null 2>&1; then
     $SUDO_CMD gtk-update-icon-cache -qtf /usr/share/icons/hicolor/
 fi
 
-echo -e "${CREAM}${BOLD}Done! guhShot is ready.${NC}"
+echo -e "${YLW}==> Done! guhShot is ready.${NC}"
