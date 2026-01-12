@@ -86,7 +86,7 @@ if [ -f "$MANGO_CONFIG" ]; then
         TARGET="bind=ALT+SHIFT,A, spawn, swaync-client -t"
         
         if grep -qF "$TARGET" "$MANGO_CONFIG"; then
-            echo -e "${CREAM}Anchor found. Injecting binds...${NC}"
+            echo -e "${GRA}Anchor found. Injecting binds...${NC}"
             sed -i "/$TARGET/a $NEW_LINES" "$MANGO_CONFIG"
         else
             echo -e "${CREAM}Anchor not found. Appending to end of file...${NC}"
