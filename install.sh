@@ -39,7 +39,7 @@ fi
 echo -e "${YLW}"
 echo " /\_/\\"
 echo "( o.o )"
-echo " > ` <"
+echo " > \` <"
 echo -e "${NC}"
 
 echo -e "${YLW}--- Installing guhShot ---${NC}"
