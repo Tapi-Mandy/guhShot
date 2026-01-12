@@ -60,7 +60,7 @@ $SUDO_CMD chmod +x "$INSTALL_DIR/guhshot"
 $SUDO_CMD curl -fsSL "$ICON_URL" -o "$ICON_DIR/guhshot.svg"
 
 # 3. Create Desktop Entry
-echo -e "${CREAM}Creating desktop entry...${NC}"
+echo -e "${YLW}--> Creating desktop entry...${NC}"
 cat <<EOF | $SUDO_CMD tee "$DESKTOP_DIR/guhshot.desktop" > /dev/null
 [Desktop Entry]
 Type=Application
