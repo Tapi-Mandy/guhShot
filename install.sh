@@ -41,7 +41,7 @@ echo "( o.o )"
 echo " > ` <"
 echo -e "${NC}"
 
-echo -e "${CREAM}${BOLD}--- Installing guhShot ---${NC}"
+echo -e "${YLW}--- Installing guhShot ---${NC}"
 
 # 1. Install Dependencies
 while [ -f /var/lib/pacman/db.lck ]; do
