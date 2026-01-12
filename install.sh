@@ -5,6 +5,7 @@ set -euo pipefail
 
 # --- Colors ---
 YLW=$'\033[1;33m' # Primary Yellow
+GRA=$'\033[1;30m' # Dark Gray
 RED=$'\033[0;31m' # Red
 NC=$'\033[0m'     # No Color
 
@@ -45,7 +46,7 @@ echo -e "${YLW}--- Installing guhShot ---${NC}"
 
 # 1. Install Dependencies
 while [ -f /var/lib/pacman/db.lck ]; do
-    echo -e "${YLW}Waiting for pacman lock...${NC}"
+    echo -e "${GRA}Waiting for pacman lock...${NC}"
     sleep 1
 done
 echo -e "${CREAM}Installing dependencies...${NC}"
