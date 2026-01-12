@@ -89,7 +89,7 @@ if [ -f "$MANGO_CONFIG" ]; then
             echo -e "${GRA}Anchor found. Injecting binds...${NC}"
             sed -i "/$TARGET/a $NEW_LINES" "$MANGO_CONFIG"
         else
-            echo -e "${CREAM}Anchor not found. Appending to end of file...${NC}"
+            echo -e "${RED}[!] Anchor not found... Appending to end of file...${NC}"
             echo -e "$NEW_LINES" >> "$MANGO_CONFIG"
         fi
         # Reset ownership to the user (in case script ran as root)
