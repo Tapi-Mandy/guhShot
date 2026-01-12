@@ -29,7 +29,7 @@ if [[ $EUID -ne 0 ]]; then
     if command -v sudo >/dev/null 2>&1; then
         SUDO_CMD="sudo"
     else
-        echo -e "${CREAM}Error: This script requires root or sudo.${NC}"
+        echo -e "${RED}[!] Error: This script requires sudo.${NC}"
         exit 1
     fi
 fi
