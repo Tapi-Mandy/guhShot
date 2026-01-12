@@ -45,7 +45,7 @@ echo -e "${YLW}--- Installing guhShot ---${NC}"
 
 # 1. Install Dependencies
 while [ -f /var/lib/pacman/db.lck ]; do
-    echo -e "${CREAM}Waiting for pacman lock...${NC}"
+    echo -e "${YLW}Waiting for pacman lock...${NC}"
     sleep 1
 done
 echo -e "${CREAM}Installing dependencies...${NC}"
