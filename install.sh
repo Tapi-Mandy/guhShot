@@ -4,9 +4,9 @@
 set -euo pipefail
 
 # --- Colors ---
-CREAM='\033[0;33m'
-BOLD='\033[1m'
-NC='\033[0m'
+YLW=$'\033[1;33m' # Primary Yellow
+RED=$'\033[0;31m' # Red
+NC=$'\033[0m'     # No Color
 
 # --- Configuration ---
 BASE_URL="https://raw.githubusercontent.com/Tapi-Mandy/guhShot/main"
