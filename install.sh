@@ -89,14 +89,14 @@ if [ -f "$MANGO_CONFIG" ]; then
             echo -e "${GRA}Anchor found. Injecting binds...${NC}"
             sed -i "/$TARGET/a $NEW_LINES" "$MANGO_CONFIG"
         else
-            echo -e "${RED}[!] Anchor not found... Appending to end of file...${NC}"
+            echo -e "${RED}[!] Warning: Anchor not found... Appending to end of file...${NC}"
             echo -e "$NEW_LINES" >> "$MANGO_CONFIG"
         fi
         # Reset ownership to the user (in case script ran as root)
         $SUDO_CMD chown "$REAL_USER":"$REAL_USER" "$MANGO_CONFIG"
     fi
 else
-    echo -e "${CREAM}Warning: Config not found at $MANGO_CONFIG. Binds not added.${NC}"
+    echo -e "${RED}[!] Warning: Config not found... Binds weren't added.${NC}"
 fi
 
 # 5. Refresh Icon Cache
