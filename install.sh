@@ -49,7 +49,7 @@ while [ -f /var/lib/pacman/db.lck ]; do
     echo -e "${GRA}Waiting for pacman lock...${NC}"
     sleep 1
 done
-echo -e "${CREAM}Installing dependencies...${NC}"
+echo -e "${YLW}--> Installing dependencies...${NC}"
 $SUDO_CMD pacman -S --needed --noconfirm grim slurp wl-clipboard libnotify
 
 # 2. Install System Files
