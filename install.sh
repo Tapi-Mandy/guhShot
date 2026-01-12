@@ -96,7 +96,7 @@ if [ -f "$MANGO_CONFIG" ]; then
         $SUDO_CMD chown "$REAL_USER":"$REAL_USER" "$MANGO_CONFIG"
     fi
 else
-    echo -e "${RED}[!] Warning: Config not found... Binds weren't added.${NC}"
+    echo -e "${RED}[!] Warning: Config not found... Binds were not added.${NC}"
 fi
 
 # 5. Refresh Icon Cache
