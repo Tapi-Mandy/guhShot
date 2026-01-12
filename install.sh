@@ -53,7 +53,7 @@ echo -e "${YLW}--> Installing dependencies...${NC}"
 $SUDO_CMD pacman -S --needed --noconfirm grim slurp wl-clipboard libnotify
 
 # 2. Install System Files
-echo -e "${CREAM}Downloading executable and icon...${NC}"
+echo -e "${YLW}--> Downloading executable and icon...${NC}"
 $SUDO_CMD mkdir -p "$INSTALL_DIR" "$ICON_DIR" "$DESKTOP_DIR"
 $SUDO_CMD curl -fsSL "$SCRIPT_URL" -o "$INSTALL_DIR/guhshot"
 $SUDO_CMD chmod +x "$INSTALL_DIR/guhshot"
