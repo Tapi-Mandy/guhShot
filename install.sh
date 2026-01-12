@@ -35,7 +35,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # ASCII Art
-echo -e "${CREAM}"
+echo -e "${YLW}"
 echo " /\_/\\"
 echo "( o.o )"
 echo " > ` <"
