@@ -86,7 +86,7 @@ if [ -f "$MANGO_CONFIG" ]; then
         TARGET="bind=ALT+SHIFT,A, spawn, swaync-client -t"
         
         if grep -qF "$TARGET" "$MANGO_CONFIG"; then
-            echo -e "${GRA}Anchor found. Injecting binds...${NC}"
+            echo -e "${GRA}-> Anchor found. Injecting binds...${NC}"
             sed -i "/$TARGET/a $NEW_LINES" "$MANGO_CONFIG"
         else
             echo -e "${RED}[!] Warning: Anchor not found... Appending to end of file...${NC}"
@@ -103,5 +103,3 @@ fi
 if command -v gtk-update-icon-cache >/dev/null 2>&1; then
     $SUDO_CMD gtk-update-icon-cache -qtf /usr/share/icons/hicolor/
 fi
-
-echo -e "${YLW}==> Done! guhShot is ready.${NC}"
