@@ -73,30 +73,21 @@ Categories=Utility;
 Keywords=screenshot;capture;grim;guh;
 EOF
 
-# 4. Patch Mango Config
-echo -e "${YLW}--> Patching config...${NC}"
-if [ -f "$MANGO_CONFIG" ]; then
-    if grep -q "guhshot" "$MANGO_CONFIG"; then
-        echo -e "${GRA}guhShot binds already exist. Skipping patch...${NC}"
-    else
-        # Define the lines to insert
-        NEW_LINES="\n# Screenshot (guhShot)\nbind=NONE, Print, spawn, guhshot --full\nbind=SHIFT, Print, spawn, guhshot --select"
-        
-        # Look for SwayNC bind as the anchor
-        TARGET="bind=ALT+SHIFT,A, spawn, swaync-client -t"
-        
-        if grep -qF "$TARGET" "$MANGO_CONFIG"; then
-            echo -e "${GRA}-> Anchor found. Injecting binds...${NC}"
-            sed -i "/$TARGET/a $NEW_LINES" "$MANGO_CONFIG"
-        else
-            echo -e "${RED}[!] Warning: Anchor not found... Appending to end of file...${NC}"
-            echo -e "$NEW_LINES" >> "$MANGO_CONFIG"
-        fi
-        # Reset ownership to the user (in case script ran as root)
-        $SUDO_CMD chown "$REAL_USER":"$REAL_USER" "$MANGO_CONFIG"
-    fi
+# 4. Install guhShot Config
+echo -e "${YLW}---> Installing guhShot config...${NC}"
+MANGO_CONF_D="$USER_HOME/.config/mango/conf.d"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Create conf.d directory if it doesn't exist
+mkdir -p "$MANGO_CONF_D"
+
+# Copy guhShot.conf to conf.d
+if [ -f "$SCRIPT_DIR/guhShot.conf" ]; then
+    cp "$SCRIPT_DIR/guhShot.conf" "$MANGO_CONF_D/guhShot.conf"
+    chown "$REAL_USER":"$REAL_USER" "$MANGO_CONF_D/guhShot.conf"
+    echo -e "${GRA}-> guhShot config installed to $MANGO_CONF_D/${NC}"
 else
-    echo -e "${RED}[!] Warning: Config not found... Binds were not added.${NC}"
+    echo -e "${RED}[!] Warning: guhShot.conf not found in script directory...${NC}"
 fi
 
 # 5. Refresh Icon Cache
