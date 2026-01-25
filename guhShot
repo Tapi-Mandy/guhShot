@@ -1,0 +1,288 @@
+#!/usr/bin/env python3
+import os
+import subprocess
+import datetime
+import json
+import sys
+import signal
+import tempfile
+import shutil
+import gi
+
+gi.require_version('Gtk', '4.0')
+gi.require_version('Adw', '1')
+gi.require_version('Notify', '0.7')
+from gi.repository import Gtk, Adw, GLib, Notify, Gdk
+
+# Paths
+CONFIG_PATH = os.path.expanduser("~/.config/guhshot/settings.json")
+DEFAULT_SAVE_PATH = os.path.expanduser("~/Pictures/Screenshots")
+
+CSS = """
+/* Window*/
+window {
+    background-color: rgba(202, 181, 163, 0.85);
+    border-radius: 0px;
+}
+
+/* Shutter */
+.shutter-button {
+    background-color: rgba(255, 255, 255, 0.4);
+    border: 6px solid rgba(15, 15, 15, 0.9);
+    border-radius: 999px;
+    min-width: 80px;
+    min-height: 80px;
+    padding: 0;
+    margin: 10px;
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shutter-button:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+    transform: scale(1.06);
+}
+
+.shutter-button:active {
+    background-color: rgba(200, 200, 200, 1.0);
+    transform: scale(0.92);
+}
+
+.close-button {
+    background: transparent;
+    color: white;
+    border-radius: 99px;
+    padding: 6px;
+    margin: 4px;
+}
+.close-button:hover {
+    background-color: rgba(255, 50, 50, 0.5);
+}
+
+.main-container {
+    margin: 10px 15px; /* Tighter margins */
+}
+
+/* Translucent list rows */
+list { 
+    background-color: rgba(255, 255, 255, 0.05); 
+    border-radius: 12px;
+}
+
+/* PreferencesGroup titles */
+.header-title {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+"""
+
+class GuhShotApp(Adw.Application):
+    def __init__(self, **kwargs):
+        super().__init__(application_id="com.tapi.guhShot", **kwargs)
+        Notify.init("guhShot")
+        self.load_settings()
+        self.connect('activate', self.on_activate)
+        signal.signal(signal.SIGINT, lambda *args: self.quit())
+
+    def load_settings(self):
+        default_settings = {
+            "save_to_file": True, 
+            "copy_to_clipboard": False, 
+            "open_in_editor": False,
+            "save_path": DEFAULT_SAVE_PATH,
+            "delay": 1
+        }
+        if os.path.exists(CONFIG_PATH):
+            try:
+                with open(CONFIG_PATH, "r") as f:
+                    self.settings = json.load(f)
+                    for k, v in default_settings.items():
+                        if k not in self.settings: self.settings[k] = v
+            except: self.settings = default_settings
+        else:
+            self.settings = default_settings
+            self.save_settings_to_disk()
+
+    def save_settings_to_disk(self):
+        os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+        with open(CONFIG_PATH, "w") as f: json.dump(self.settings, f)
+
+    def send_notification(self, title, message):
+        n = Notify.Notification.new(title, message, "camera-photo-symbolic")
+        n.show()
+
+    def on_activate(self, app):
+        provider = Gtk.CssProvider()
+        provider.load_from_data(CSS.encode())
+        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+        self.win = Adw.ApplicationWindow(application=app)
+        self.win.set_title("guhShot")
+        self.win.set_default_size(360, 480) # Reduced default height
+        self.win.set_decorated(False) 
+        self.win.set_opacity(0.94) 
+
+        handle = Gtk.WindowHandle()
+        main_layout = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        
+        # Mini Close Header
+        mini_header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        spacer = Gtk.Box(hexpand=True)
+        close_btn = Gtk.Button.new_from_icon_name("window-close-symbolic")
+        close_btn.add_css_class("close-button")
+        close_btn.connect("clicked", lambda x: self.quit())
+        mini_header.append(spacer)
+        mini_header.append(close_btn)
+        main_layout.append(mini_header)
+
+        # Clamp
+        clamp = Adw.Clamp(maximum_size=330)
+        content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8) # Reduced spacing
+        content.add_css_class("main-container")
+
+        # --- Capture Group ---
+        capture_group = Adw.PreferencesGroup(title="Capture")
+        self.radio_fullscreen = Gtk.CheckButton(label="Entire Screen")
+        self.radio_region = Gtk.CheckButton(label="Select Region", group=self.radio_fullscreen)
+        self.radio_region.set_active(True)
+        
+        full_row = Adw.ActionRow(title="Fullscreen"); full_row.add_prefix(self.radio_fullscreen)
+        reg_row = Adw.ActionRow(title="Region"); reg_row.add_prefix(self.radio_region)
+        
+        adj = Gtk.Adjustment(value=self.settings["delay"], lower=0, upper=10, step_increment=1)
+        self.delay_row = Adw.SpinRow(title="Delay (s)", adjustment=adj)
+        self.delay_row.connect("notify::value", self.on_delay_changed)
+        
+        capture_group.add(full_row); capture_group.add(reg_row); capture_group.add(self.delay_row)
+        content.append(capture_group)
+
+        # --- Output Group ---
+        output_group = Adw.PreferencesGroup(title="Output")
+        
+        self.editor_toggle = Gtk.Switch(active=self.settings["open_in_editor"], valign=Gtk.Align.CENTER)
+        self.editor_toggle.connect("state-set", self.on_pref_changed, "open_in_editor")
+        editor_row = Adw.ActionRow(title="Open in Swappy"); editor_row.add_suffix(self.editor_toggle)
+        
+        self.clip_toggle = Gtk.Switch(active=self.settings["copy_to_clipboard"], valign=Gtk.Align.CENTER)
+        self.clip_toggle.connect("state-set", self.on_pref_changed, "copy_to_clipboard")
+        clip_row = Adw.ActionRow(title="Copy to Clipboard"); clip_row.add_suffix(self.clip_toggle)
+        
+        self.save_toggle = Gtk.Switch(active=self.settings["save_to_file"], valign=Gtk.Align.CENTER)
+        self.save_toggle.connect("state-set", self.on_save_toggled)
+        save_row = Adw.ActionRow(title="Save to File"); save_row.add_suffix(self.save_toggle)
+        
+        self.path_row = Adw.ActionRow(title="Location", subtitle=self.settings["save_path"])
+        self.path_row.set_activatable(True); self.path_row.set_sensitive(self.settings["save_to_file"])
+        self.path_row.add_suffix(Gtk.Image.new_from_icon_name("folder-open-symbolic"))
+        self.path_row.connect("activated", self.on_change_path_clicked)
+        
+        output_group.add(editor_row); output_group.add(clip_row); output_group.add(save_row); output_group.add(self.path_row)
+        content.append(output_group)
+
+        # --- Shutter ---
+        shutter_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, halign=Gtk.Align.CENTER)
+        self.btn_shutter = Gtk.Button()
+        self.btn_shutter.add_css_class("shutter-button")
+        self.btn_shutter.connect("clicked", self.on_gui_capture_clicked)
+        shutter_box.append(self.btn_shutter)
+        content.append(shutter_box)
+
+        clamp.set_child(content)
+        main_layout.append(clamp)
+        handle.set_child(main_layout)
+        self.win.set_content(handle)
+        self.win.present()
+
+    def on_pref_changed(self, switch, state, key):
+        self.settings[key] = state
+        self.save_settings_to_disk()
+
+    def on_delay_changed(self, row, pspec):
+        self.settings["delay"] = int(row.get_value())
+        self.save_settings_to_disk()
+
+    def on_save_toggled(self, switch, state):
+        self.settings["save_to_file"] = state
+        self.path_row.set_sensitive(state)
+        self.save_settings_to_disk()
+
+    def on_change_path_clicked(self, row):
+        dialog = Gtk.FileChooserNative(title="Select Folder", transient_for=self.win, action=Gtk.FileChooserAction.SELECT_FOLDER)
+        dialog.connect("response", self.on_path_dialog_response); dialog.show()
+
+    def on_path_dialog_response(self, dialog, response):
+        if response == Gtk.ResponseType.ACCEPT:
+            new_path = dialog.get_file().get_path()
+            self.settings["save_path"] = new_path
+            self.path_row.set_subtitle(new_path)
+            self.save_settings_to_disk()
+        dialog.destroy()
+
+    def on_gui_capture_clicked(self, btn):
+        mode = "region" if self.radio_region.get_active() else "fullscreen"
+        self.win.set_visible(False)
+        GLib.timeout_add(self.settings["delay"] * 1000 + 150, self.execute_capture, mode)
+
+    def execute_capture(self, mode):
+        geom = None
+        if mode == "region":
+            try:
+                slurp_proc = subprocess.run(["slurp"], capture_output=True, text=True)
+                if slurp_proc.returncode != 0:
+                    self.win.set_visible(True); return
+                geom = slurp_proc.stdout.strip()
+            except Exception: self.win.set_visible(True); return
+
+        temp_file = os.path.join(tempfile.gettempdir(), "guhshot_buffer.png")
+        grim_cmd = ["grim"]
+        if geom: grim_cmd.extend(["-g", geom])
+        grim_cmd.append(temp_file)
+
+        try:
+            subprocess.run(grim_cmd, check=True)
+            if self.settings["open_in_editor"]:
+                subprocess.run(["swappy", "-f", temp_file, "-o", temp_file])
+
+            msgs = []
+            if self.settings["save_to_file"]:
+                save_dir = self.settings.get("save_path", DEFAULT_SAVE_PATH)
+                os.makedirs(save_dir, exist_ok=True)
+                timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+                final_path = os.path.join(save_dir, f"guhShot_{timestamp}.png")
+                shutil.copy(temp_file, final_path); msgs.append("Saved")
+
+            if self.settings["copy_to_clipboard"]:
+                with open(temp_file, "rb") as f:
+                    subprocess.run(["wl-copy", "-t", "image/png"], stdin=f)
+                msgs.append("Copied")
+
+            if msgs: self.send_notification("Screenshot Captured", " & ".join(msgs))
+            if os.path.exists(temp_file): os.remove(temp_file)
+
+        except Exception as e:
+            self.send_notification("Error", str(e)); self.win.set_visible(True); return
+
+        self.quit()
+
+if __name__ == "__main__":
+    app = GuhShotApp()
+    
+    # Check if we are running from a keybind/CLI
+    if len(sys.argv) > 1:
+        arg = sys.argv[1]
+        
+        # Explicitly handle the two modes
+        if arg == "--region":
+            mode = "region"
+        elif arg == "--full":
+            mode = "fullscreen"
+        else:
+            # If the argument isn't recognized, fallback to opening the GUI
+            app.run(sys.argv)
+            sys.exit(0)
+
+        # Trigger the capture without showing the GUI window
+        GLib.timeout_add(app.settings["delay"] * 1000, lambda: (app.execute_capture(mode), False))
+        app.run(None)
+    else:
+        # No arguments: Open the GUI normally
+        app.run(sys.argv)
