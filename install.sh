@@ -10,7 +10,6 @@ RED=$'\033[0;31m' # Red
 NC=$'\033[0m'     # No Color
 
 # --- Configuration ---
-# Updated to match your repo filename 'guhShot'
 BASE_URL="https://raw.githubusercontent.com/Tapi-Mandy/guhShot/main"
 SCRIPT_URL="$BASE_URL/guhShot"
 ICON_URL="$BASE_URL/icon.svg"
