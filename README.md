@@ -10,10 +10,10 @@ curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhShot/main/install.sh 
 ```
 
 ### Keybinds
-### mangowc / guhwm:
+> mangowc / guhwm:
 ```ini
-bind=NONE, Print, spawn, guhshot --full
-bind=SHIFT, Print, spawn, guhshot --select
+bind=NONE, Print, spawn, guhShot --full
+bind=SHIFT, Print, spawn, guhShot --region
 ```
 
 > [!IMPORTANT]
