@@ -18,10 +18,6 @@ INSTALL_DIR="/usr/bin"
 DESKTOP_DIR="/usr/share/applications"
 ICON_DIR="/usr/share/icons/hicolor/scalable/apps"
 
-# Identify the real user
-REAL_USER=${SUDO_USER:-$USER}
-USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
-
 # Helper for sudo
 SUDO_CMD=""
 if [[ $EUID -ne 0 ]]; then
@@ -53,6 +49,7 @@ $SUDO_CMD pacman -S --needed --noconfirm \
     slurp \
     wl-clipboard \
     libnotify \
+    gtk3 \
     python-gobject \
     swappy
 
@@ -79,21 +76,6 @@ Categories=Utility;
 Keywords=screenshot;capture;grim;guh;
 StartupWMClass=com.tapi.guhShot
 EOF
-
-# 4. Setup guhShot Keybinds
-echo -e "${YLW}---> Setting up keybinds...${NC}"
-MANGO_CONF_D="$USER_HOME/.config/mango/conf.d"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-mkdir -p "$MANGO_CONF_D"
-
-if [ -f "$SCRIPT_DIR/guhShot.conf" ]; then
-    cp "$SCRIPT_DIR/guhShot.conf" "$MANGO_CONF_D/guhShot.conf"
-    chown "$REAL_USER":"$REAL_USER" "$MANGO_CONF_D/guhShot.conf"
-    echo -e "${GRA}-> Keybinds installed to $MANGO_CONF_D/guhShot.conf${NC}"
-else
-    echo -e "${RED}[!] Warning: guhShot.conf not found. Skipping keybinds setup.${NC}"
-fi
 
 # 5. Refresh Icon Cache
 if command -v gtk-update-icon-cache >/dev/null 2>&1; then
