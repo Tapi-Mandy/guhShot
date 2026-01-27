@@ -54,8 +54,6 @@ $SUDO_CMD pacman -S --needed --noconfirm \
     wl-clipboard \
     libnotify \
     python-gobject \
-    libadwaita \
-    gtk4 \
     swappy
 
 # 2. Install System Files
