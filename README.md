@@ -1,5 +1,6 @@
 <div align="left">
-  <h4><img src="https://github.com/user-attachments/assets/485af1aa-52d7-4700-a0db-f42fec1d870c" width="170"> Advanced Wayland Screenshot Tool Made With Python & GTK3</h4>
+  <img src="https://github.com/user-attachments/assets/485af1aa-52d7-4700-a0db-f42fec1d870c" width="170">
+  <h3>Advanced Wayland Screenshot Tool Made With Python & GTK3</h3>
 </div>
 
 ---
