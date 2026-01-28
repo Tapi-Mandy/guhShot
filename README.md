@@ -1,5 +1,5 @@
 <div align="left">
-  <h3><img src="https://github.com/user-attachments/assets/485af1aa-52d7-4700-a0db-f42fec1d870c" width="180"> Simple wrapper for `grim` & `slurp`</h3>
+  <h4><img src="https://github.com/user-attachments/assets/485af1aa-52d7-4700-a0db-f42fec1d870c" width="170"> Advanced Wayland Screenshot Tool Made With Python & GTK3</h4>
 </div>
 
 ---
