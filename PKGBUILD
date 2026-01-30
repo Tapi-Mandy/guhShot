@@ -6,7 +6,7 @@ pkgdesc="Guh?? Take a Screenshot!"
 arch=('any')
 url="https://github.com/Tapi-Mandy/guhShot"
 license=('MIT')
-depends=('grim' 'slurp' 'wl-clipboard' 'libnotify' 'gtk3' 'python-gobject' 'swappy')
+depends=('grim' 'slurp' 'wl-clipboard' 'libnotify' 'gtk3' 'python-gobject' 'swappy' 'ttf-jetbrains-mono-nerd')
 source=(
   "guhshot::https://raw.githubusercontent.com/Tapi-Mandy/guhShot/main/guhShot"
   "guhshot.png::https://raw.githubusercontent.com/Tapi-Mandy/guhShot/main/assets/guhshot.png"

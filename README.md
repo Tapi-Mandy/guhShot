@@ -4,7 +4,7 @@
 </div>
 
 ---
-> **Advanced screenshotting tool for Wayland**
+> **Advanced Wayland screenshot utility;**
 >
 > Designed for [guhwm](https://github.com/Tapi-Mandy/guhwm)
 
