@@ -1,23 +1,26 @@
 <div align="left">
-  <img src="https://github.com/user-attachments/assets/485af1aa-52d7-4700-a0db-f42fec1d870c" width="170">
-  <h3>Advanced Wayland Screenshot Tool Made With Python & GTK3</h3>
+  <img width="25%" alt="guhShot" src="https://github.com/user-attachments/assets/0ba5d51a-91ac-4b3e-88ca-b70d6158a691"/>
+  <h3>Guh?? Take a screenshot!</h3>
 </div>
 
 ---
-
-### Install.sh
-```bash
-curl -fsSL https://raw.githubusercontent.com/Tapi-Mandy/guhShot/main/install.sh | bash
-```
-
-### Keybinds
-> mangowc / guhwm:
-```ini
-bind=NONE, Print, spawn, guhShot --full
-bind=SHIFT, Print, spawn, guhShot --region
-```
-
-> [!IMPORTANT]
-> The functionality of the installation script is designed for [guhwm](https://github.com/Tapi-Mandy/guhwm).
+> **Advanced screenshotting tool for Wayland**
 >
-> You would need to clone the repository and manually install this weird little odd screenshot tool for your own setup.
+> Designed for [guhwm](https://github.com/Tapi-Mandy/guhwm)
+
+---
+## Installation
+### <sub><img src="https://cdn.simpleicons.org/archlinux/1793D1" height="25" width="25"></sub> Arch Linux
+
+```bash
+git clone https://github.com/Tapi-Mandy/ASCII2PNG.git
+cd ASCII2PNG
+makepkg -si
+```
+
+## Keybinds
+<b>MangoWC / guhwm:</b>
+```ini
+bind=NONE, Print, spawn, guhshot --full
+bind=SHIFT, Print, spawn, guhshot --region
+```
