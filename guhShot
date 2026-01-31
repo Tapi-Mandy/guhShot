@@ -17,6 +17,10 @@ CONFIG_DIR = os.path.expanduser("~/.config/guhshot")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 DEFAULT_SAVE_DIR = os.path.expanduser("~/Pictures/Screenshots")
 
+# This sets the Wayland App ID and the primary display name
+GLib.set_prgname('guhShot')
+GLib.set_application_name('guhShot')
+
 DEFAULT_CONFIG = {
     "mode": "full",
     "delay": 0,
@@ -48,7 +52,8 @@ def save_config(config):
 
 class GuhShot(Gtk.Window):
     def __init__(self):
-        super().__init__(title="GuhShot")
+        super().__init__(title="guhShot")
+        
         self.config = load_config()
         self.save_dir = self.config["save_dir"]
 
@@ -102,7 +107,6 @@ class GuhShot(Gtk.Window):
         self.switch_clip = Gtk.Switch(active=self.config["copy_clipboard"])
         self.switch_save = Gtk.Switch(active=self.config["save_to_file"])
 
-        # Connect switches to sync settings immediately
         self.switch_swappy.connect("notify::active", self.sync_settings)
         self.switch_clip.connect("notify::active", self.sync_settings)
         self.switch_save.connect("notify::active", self.sync_settings)
@@ -148,7 +152,6 @@ class GuhShot(Gtk.Window):
         self.show_all()
 
     def sync_settings(self, *args):
-        """Reads current UI state and saves to config file."""
         self.config = {
             "mode": "full" if self.full_radio.get_active() else "region",
             "delay": self.delay_spin.get_value_as_int(),
@@ -206,7 +209,7 @@ class GuhShot(Gtk.Window):
         if response == Gtk.ResponseType.OK:
             self.save_dir = dialog.get_filename()
             self.loc_path_label.set_markup(f"<span size='small' alpha='55%'>{self.save_dir}</span>")
-            self.sync_settings() # Save config after folder change
+            self.sync_settings()
         dialog.destroy()
 
     def on_shutter_clicked(self, widget):
@@ -250,7 +253,7 @@ def take_screenshot(mode="full", delay=0, save=True, clipboard=True, swappy=Fals
     
     notifs = []
     if clipboard:
-        subprocess.run(f"wl-copy < {tmp_path}", shell=True)
+        subprocess.run(f"wl-copy -t image/png < {tmp_path}", shell=True)
         notifs.append("Copied to Clipboard!")
     if save:
         if not os.path.exists(directory):
