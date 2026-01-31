@@ -11,7 +11,7 @@ depends=('grim' 'slurp' 'wl-clipboard' 'libnotify' 'gtk3' 'python-gobject' 'swap
 source=("guhShot"
         "guhshot.png")
 
-sha256sums=('68f5c62eb1241e5425148333d89c09556dc5331f7247282d62d8c5f13c0e8714'
+sha256sums=('e5f902986e7190fe70e08fe2aaf1c6c19e3a24efb4456f9bcaae2b2d17931584'
             '5f4cf86e81390dae9775025d9e8341f0af9e3ab72bf7a063938769586842764b')
 
 package() {
